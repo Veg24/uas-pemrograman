@@ -59,6 +59,11 @@ class RiwayatController extends Controller
                     'status' => $r->status,
                     'created_at' => $r->created_at,
                     'url' => route('reservasi.show', $r->id),
+                    'meja_nomor' => $r->meja ? $r->meja->nomor_meja : 'N/A',
+                    'area' => $r->meja ? $r->meja->area : '',
+                    'jumlah_tamu' => $r->jumlah_tamu,
+                    'tanggal' => $r->tanggal,
+                    'jam' => $r->jam,
                 ]);
             }
         }
@@ -78,6 +83,8 @@ class RiwayatController extends Controller
                     'status' => $p->status,
                     'created_at' => $p->created_at,
                     'url' => route('pesan.show', $p->id),
+                    'total_harga' => $p->total_harga,
+                    'tipe_pesanan' => $p->tipe,
                 ]);
             }
         }

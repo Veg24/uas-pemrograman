@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Round dark brown background matching Lumiere theme -->
+  <rect width="100" height="100" rx="20" fill="#3D2D1E"/>
+  <!-- Gold Plate Cover / Cloche Icon -->
+  <path d="M50 20c-1.66 0-3 1.34-3 3 0 .75.28 1.44.73 1.97C36.37 26.63 28 35.84 28 47v3h44v-3c0-11.16-8.37-20.37-19.73-22.03.45-.53.73-1.22.73-1.97 0-1.66-1.34-3-3-3zm0 9c8.28 0 15 6.72 15 15h4c0-10.5-8.5-19-19-19v4z" fill="#C8882A"/>
+  <!-- Base Tray -->
+  <path d="M20 53h60v4H20z" fill="#C8882A"/>
+</svg>

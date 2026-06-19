@@ -7,66 +7,68 @@
         ratingKomentar: '',
         submitRating() {
             this.showRatingModal = false;
-            // Dispatch a successful rating message to the toast
             alert('Terima kasih! Ulasan bintang ' + this.stars + ' Anda untuk ' + this.ratingAktivitasJudul + ' telah terkirim.');
-            // Reset state
             this.stars = 5;
             this.ratingKomentar = '';
         }
     }" class="space-y-6">
 
         <!-- Header -->
-        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-[#E8E0D5]">
+        <header class="flex items-center justify-between pb-6 border-b border-[#E8E0D5]">
             <div>
-                <h1 class="font-serif text-3xl font-black text-[#1A1A1A]">Riwayat Aktivitas</h1>
-                <p class="text-sm font-body text-[#7A6A58] mt-1">Daftar reservasi meja dan pemesanan kuliner yang pernah Anda lakukan.</p>
+                <h1 class="font-serif text-3xl font-bold text-[#1A1A1A]">Riwayat Aktivitas</h1>
+                <p class="text-sm font-body text-[#7A6A58] mt-1">Lacak semua reservasi dan pesanan Anda.</p>
             </div>
             
-            <!-- Quick Notification / Action links -->
-            <a href="{{ route('reservasi.index') }}" class="sm:self-start">
-                <x-button variant="primary" size="sm">
-                    Pesan Meja Lagi
-                </x-button>
-            </a>
+            <div class="flex items-center space-x-4">
+                <span class="text-xs font-bold text-[#7A6A58]">Welcome, {{ Auth::user()->nama }}</span>
+                <!-- Notification icon -->
+                <button class="relative p-2 text-[#7A6A58] hover:text-[#C8882A] hover:bg-white rounded-full transition-all border border-[#E8E0D5] bg-white">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                    </svg>
+                    <span class="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-[#E95252] ring-2 ring-white"></span>
+                </button>
+            </div>
         </header>
 
         <!-- Stats Boxes Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <x-card class="bg-white border border-[#E8E0D5]">
-                <div class="flex items-center space-x-4">
-                    <div class="p-3 bg-[#EAF7F1] rounded-xl text-[#4CAF82]">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-[#7A6A58] uppercase tracking-wider">Total Reservasi</p>
-                        <h3 class="text-2xl font-black text-[#1A1A1A] mt-0.5 font-mono">{{ $totalReservasi }}</h3>
-                    </div>
+            <div class="bg-white border border-[#E8E0D5] rounded-2xl p-6 flex items-center space-x-4 shadow-sm">
+                <div class="w-12 h-12 rounded-full bg-[#FEF6EB] flex items-center justify-center text-[#C8882A]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
                 </div>
-            </x-card>
+                <div>
+                    <p class="text-xs font-bold text-[#AB9BB0] uppercase tracking-wider">Total Reservasi</p>
+                    <h3 class="text-3xl font-black text-[#1A1A1A] mt-0.5">{{ $totalReservasi }}</h3>
+                </div>
+            </div>
 
-            <x-card class="bg-white border border-[#E8E0D5]">
-                <div class="flex items-center space-x-4">
-                    <div class="p-3 bg-[#ECF3FE] rounded-xl text-[#3B82F6]">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-[#7A6A58] uppercase tracking-wider">Pesanan Selesai</p>
-                        <h3 class="text-2xl font-black text-[#1A1A1A] mt-0.5 font-mono">{{ $pesananSelesai }}</h3>
-                    </div>
+            <div class="bg-white border border-[#E8E0D5] rounded-2xl p-6 flex items-center space-x-4 shadow-sm">
+                <div class="w-12 h-12 rounded-full bg-[#EAF7F1] flex items-center justify-center text-[#4CAF82]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    </svg>
                 </div>
-            </x-card>
+                <div>
+                    <p class="text-xs font-bold text-[#AB9BB0] uppercase tracking-wider">Pesanan Selesai</p>
+                    <h3 class="text-3xl font-black text-[#1A1A1A] mt-0.5">{{ $pesananSelesai }}</h3>
+                </div>
+            </div>
 
-            <x-card class="bg-white border border-[#E8E0D5]">
-                <div class="flex items-center space-x-4">
-                    <div class="p-3 bg-[#FDF1F1] rounded-xl text-[#E95252]">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="text-xs font-semibold text-[#7A6A58] uppercase tracking-wider">Aktivitas Dibatalkan</p>
-                        <h3 class="text-2xl font-black text-[#1A1A1A] mt-0.5 font-mono">{{ $totalDibatalkan }}</h3>
-                    </div>
+            <div class="bg-white border border-[#E8E0D5] rounded-2xl p-6 flex items-center space-x-4 shadow-sm">
+                <div class="w-12 h-12 rounded-full bg-[#FDF1F1] flex items-center justify-center text-[#E95252]">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-            </x-card>
+                <div>
+                    <p class="text-xs font-bold text-[#AB9BB0] uppercase tracking-wider">Dibatalkan</p>
+                    <h3 class="text-3xl font-black text-[#1A1A1A] mt-0.5">{{ $totalDibatalkan }}</h3>
+                </div>
+            </div>
         </div>
 
         <!-- Filter Bar -->
@@ -81,10 +83,10 @@
                 ] as $tabKey => $tabLabel)
                     <a 
                         href="{{ route('riwayat', array_merge(request()->query(), ['tab' => $tabKey, 'page' => 1])) }}"
-                        class="px-4 py-2 rounded-xl text-xs font-semibold font-body border transition-all duration-150"
+                        class="px-4 py-2 rounded-full text-xs font-bold font-body border transition-all duration-150"
                         :class="'{{ $tab }}' === '{{ $tabKey }}' 
-                            ? 'bg-[#1A1A1A] text-white border-[#1A1A1A] shadow-sm' 
-                            : 'bg-[#FAF7F2] text-[#7A6A58] border-[#E8E0D5] hover:border-[#D4C9BB]'"
+                            ? 'bg-[#C8882A] text-white border-[#C8882A] shadow-sm' 
+                            : 'bg-white text-[#7A6A58] border-[#E8E0D5] hover:border-[#D4C9BB]'"
                     >
                         {{ $tabLabel }}
                     </a>
@@ -92,15 +94,18 @@
             </div>
 
             <!-- Period Select Dropdown -->
-            <div class="w-full sm:w-auto flex items-center space-x-2 text-xs">
-                <span class="text-[#7A6A58] font-semibold whitespace-nowrap">Periode:</span>
+            <div class="w-full sm:w-auto flex items-center space-x-2 text-xs bg-[#FAF7F2] border border-[#D4C9BB] rounded-xl px-3 py-2">
+                <!-- Calendar outline icon -->
+                <svg class="w-4 h-4 text-[#7A6A58]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
                 <select 
                     onchange="location = this.value;"
-                    class="bg-[#FAF7F2] border border-[#D4C9BB] rounded-xl px-3 py-2 text-xs font-semibold text-[#1A1A1A] focus:outline-none focus:ring-1 focus:ring-[#C8882A]"
+                    class="bg-transparent border-0 p-0 text-xs font-bold text-[#1A1A1A] focus:outline-none focus:ring-0 cursor-pointer"
                 >
-                    <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => '30_days', 'page' => 1])) }}" {{ $periode === '30_days' ? 'selected' : '' }}>30 Hari Terakhir</option>
-                    <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => '6_months', 'page' => 1])) }}" {{ $periode === '6_months' ? 'selected' : '' }}>6 Bulan Terakhir</option>
-                    <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => '1_year', 'page' => 1])) }}" {{ $periode === '1_year' ? 'selected' : '' }}>1 Tahun Terakhir</option>
+                    <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => '30_days', 'page' => 1])) }}" {{ $periode === '30_days' ? 'selected' : '' }}>Last 30 Days</option>
+                    <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => '6_months', 'page' => 1])) }}" {{ $periode === '6_months' ? 'selected' : '' }}>Last 6 Months</option>
+                    <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => '1_year', 'page' => 1])) }}" {{ $periode === '1_year' ? 'selected' : '' }}>Last 1 Year</option>
                     <option value="{{ route('riwayat', array_merge(request()->query(), ['periode' => 'semua', 'page' => 1])) }}" {{ $periode === 'semua' ? 'selected' : '' }}>Semua Waktu</option>
                 </select>
             </div>
@@ -111,7 +116,7 @@
             @if ($paginatedActivities->isEmpty())
                 <div class="text-center py-16 bg-white rounded-2xl border border-[#E8E0D5]">
                     <div class="inline-flex p-3 bg-[#FAF7F2] rounded-full text-[#AB9BB0] border border-[#E8E0D5] mb-3">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <p class="text-sm text-[#7A6A58]">Tidak ada aktivitas yang ditemukan untuk periode ini.</p>
                 </div>
@@ -123,69 +128,96 @@
                     @foreach ($paginatedActivities as $index => $act)
                         @php
                             $isEven = $index % 2 === 0;
+                            $statusColor = match($act->status) {
+                                'dikonfirmasi', 'selesai' => 'bg-[#EAF7F1] text-[#4CAF82]',
+                                'dibatalkan' => 'bg-[#FDF1F1] text-[#E95252]',
+                                'menunggu', 'diproses', 'dikirim' => 'bg-[#FEF6EB] text-[#C8882A]',
+                                default => 'bg-gray-100 text-gray-500'
+                            };
+                            $dotColor = match($act->status) {
+                                'dikonfirmasi', 'selesai' => 'bg-[#4CAF82]',
+                                'dibatalkan' => 'bg-[#E95252]',
+                                'menunggu', 'diproses', 'dikirim' => 'bg-[#C8882A]',
+                                default => 'bg-gray-400'
+                            };
                         @endphp
                         
                         <!-- Timeline Item -->
                         <div class="flex flex-col md:flex-row items-start {{ $isEven ? 'md:flex-row-reverse' : '' }} w-full">
                             <!-- Left/Right Card Spacer -->
                             <div class="w-full md:w-1/2 px-0 md:px-8 pl-12 md:pl-0">
-                                <x-card class="shadow-sm border border-[#E8E0D5] bg-white transition-all hover:shadow-md">
-                                    <div class="space-y-4">
-                                        <!-- Header activity -->
-                                        <div class="flex justify-between items-start gap-4">
-                                            <div>
-                                                <span class="text-[9.5px] font-mono text-[#AB9BB0] block">{{ $act->created_at->format('d M Y, H:i') }}</span>
-                                                <h4 class="font-serif text-base font-bold text-[#1A1A1A] mt-1">{{ $act->judul }}</h4>
-                                            </div>
-                                            <x-badge :variant="
-                                                $act->status === 'dikonfirmasi' || $act->status === 'selesai' ? 'success' : 
-                                                ($act->status === 'menunggu' || $act->status === 'diproses' || $act->status === 'dikirim' ? 'warning' : 'error')
-                                            ">
-                                                {{ strtoupper($act->status) }}
-                                            </x-badge>
+                                <div class="bg-white border border-[#E8E0D5] rounded-2xl p-6 shadow-sm hover:shadow-md transition-all duration-200 space-y-4">
+                                    
+                                    <!-- Card Header -->
+                                    <div class="flex items-start space-x-3">
+                                        <!-- Type Icon box -->
+                                        <div class="p-2.5 rounded-xl flex-shrink-0 {{ $act->tipe === 'reservasi' ? 'bg-[#FEF6EB] text-[#C8882A]' : 'bg-gray-100 text-[#7A6A58]' }}">
+                                            @if($act->tipe === 'reservasi')
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                                </svg>
+                                            @else
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                                                </svg>
+                                            @endif
                                         </div>
 
-                                        <!-- Description -->
-                                        <p class="text-xs text-[#7A6A58] leading-relaxed">{{ $act->deskripsi }}</p>
+                                        <div class="flex-1 min-w-0">
+                                            <span class="text-[10px] font-bold text-[#AB9BB0] uppercase block">
+                                                {{ $act->created_at->diffForHumans() }}
+                                            </span>
+                                            <h4 class="font-bold text-sm text-[#1A1A1A] mt-0.5 truncate">
+                                                @if($act->tipe === 'reservasi')
+                                                    Reservasi — Meja {{ $act->meja_nomor }} · {{ $act->area === 'indoor' ? 'Indoor' : 'Terrace' }} · {{ $act->jumlah_tamu }} Tamu
+                                                @else
+                                                    Pesanan Makanan — {{ $act->tipe_pesanan === 'dine_in' ? 'Dine In' : 'Delivery' }}
+                                                @endif
+                                            </h4>
+                                        </div>
 
-                                        <!-- Action buttons -->
-                                        <div class="flex flex-wrap gap-2 pt-2 border-t border-[#F5F1EB]">
-                                            <a href="{{ $act->url }}">
-                                                <x-button variant="secondary" size="sm">
-                                                    Lihat Detail
-                                                </x-button>
-                                            </a>
-                                            
-                                            @if ($act->status === 'selesai')
-                                                <x-button 
+                                        @if($act->tipe === 'pesan')
+                                            <span class="font-bold text-xs text-[#1A1A1A] text-right font-mono block pt-1">
+                                                Rp {{ number_format($act->total_harga, 0, ',', '.') }}
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    <!-- Description / Notes -->
+                                    <div class="flex justify-between items-center pt-2">
+                                        <span class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider {{ $statusColor }}">
+                                            {{ $act->status }}
+                                        </span>
+
+                                        <div class="flex items-center space-x-2">
+                                            @if ($act->status === 'selesai' && $act->tipe === 'reservasi')
+                                                <button 
                                                     type="button" 
-                                                    variant="ghost" 
-                                                    size="sm"
                                                     @click="showRatingModal = true; ratingAktivitasId = '{{ $act->tipe . '_' . $act->id }}'; ratingAktivitasJudul = '{{ $act->judul }}'"
-                                                    class="text-[#C8882A] hover:bg-[#FEF6EB]"
+                                                    class="text-xs font-bold text-[#C8882A] hover:underline"
                                                 >
-                                                    Beri Rating
-                                                </x-button>
-                                            @endif
-                                            
-                                            @if ($act->tipe === 'pesan' && in_array($act->status, ['diproses', 'dikirim']))
-                                                <a href="{{ $act->url }}">
-                                                    <x-button variant="primary" size="sm">
-                                                        Lacak Pesanan
-                                                    </x-button>
+                                                    Beri Rating ★
+                                                </button>
+                                            @elseif ($act->tipe === 'pesan' && in_array($act->status, ['diproses', 'dikirim']))
+                                                <a href="{{ $act->url }}" class="bg-[#C8882A] hover:bg-[#B67720] text-white px-3 py-1 rounded text-[10px] font-bold uppercase tracking-wider transition-colors">
+                                                    Lacak Pesanan
+                                                </a>
+                                            @else
+                                                <a href="{{ $act->url }}" class="text-xs font-bold text-[#C8882A] hover:underline">
+                                                    Lihat Detail &gt;
                                                 </a>
                                             @endif
                                         </div>
                                     </div>
-                                </x-card>
+
+                                </div>
                             </div>
 
-                            <!-- central bullet connector -->
-                            <div class="absolute left-6 md:left-1/2 -translate-x-[9.5px] mt-8 w-5 h-5 rounded-full border-4 border-[#FAF7F2] z-20 flex items-center justify-center
-                                 @if($act->tipe === 'reservasi') bg-[#C8882A] @else bg-[#4CAF82] @endif">
+                            <!-- Central Bullet Connector -->
+                            <div class="absolute left-6 md:left-1/2 -translate-x-[9.5px] mt-8 w-5 h-5 rounded-full border-4 border-[#FAF7F2] z-20 flex items-center justify-center {{ $dotColor }}">
                             </div>
 
-                            <!-- spacer for right/left side -->
+                            <!-- Spacer for Right/Left Side -->
                             <div class="hidden md:block w-1/2"></div>
                         </div>
                     @endforeach
@@ -317,12 +349,12 @@
 
                     <!-- Actions -->
                     <div class="flex items-center space-x-3 pt-2">
-                        <x-button type="button" @click="showRatingModal = false" variant="secondary" class="w-1/2">
+                        <button type="button" @click="showRatingModal = false" class="w-1/2 bg-white hover:bg-gray-50 border border-[#D4C9BB] text-[#7A6A58] py-2.5 rounded-lg text-xs font-bold transition-all">
                             Batal
-                        </x-button>
-                        <x-button type="button" @click="submitRating()" variant="primary" class="w-1/2">
+                        </button>
+                        <button type="button" @click="submitRating()" class="w-1/2 bg-[#1A1A1A] hover:bg-gray-800 text-white py-2.5 rounded-lg text-xs font-bold transition-all">
                             Kirim Ulasan
-                        </x-button>
+                        </button>
                     </div>
 
                 </div>

@@ -18,14 +18,28 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        \Illuminate\Support\Facades\Mail::fake();
+
         $response = $this->post('/register', [
-            'name' => 'Test User',
+            'nama' => 'Test User',
             'email' => 'test@example.com',
+            'no_hp' => '08123456789',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'terms' => 'on',
         ]);
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+
+        $this->assertDatabaseHas('users', [
+            'email' => 'test@example.com',
+            'nama' => 'Test User',
+            'no_hp' => '08123456789',
+        ]);
+
+        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\WelcomeMail::class, function ($mail) {
+            return $mail->hasTo('test@example.com') && $mail->user->nama === 'Test User';
+        });
     }
 }

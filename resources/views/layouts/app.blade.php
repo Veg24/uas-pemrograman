@@ -7,6 +7,9 @@
 
     <title>{{ config('app.name', 'Lumière Dining') }}</title>
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -28,14 +31,16 @@
 
         <!-- Sidebar -->
         <aside 
-            class="fixed inset-y-0 left-0 z-40 w-64 bg-[#1A1A1A] text-white flex flex-col justify-between transform md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-[#4A3728]"
+            class="fixed inset-y-0 left-0 z-40 w-64 bg-[#3D2D1E] text-white flex flex-col justify-between transform md:translate-x-0 transition-transform duration-300 ease-in-out border-r border-[#4A3728]/30"
             :class="mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full md:relative md:translate-x-0'"
         >
             <div>
                 <!-- Sidebar Header / Logo -->
-                <div class="p-6 text-center border-b border-[#4A3728]/50">
-                    <h1 class="font-serif text-2xl font-black tracking-widest text-[#C8882A]">LUMIÈRE</h1>
-                    <p class="text-[9px] uppercase tracking-widest text-[#AB9BB0] mt-1">Fine Dining & Bistro</p>
+                <div class="p-6 flex items-center space-x-3 border-b border-[#4A3728]/50">
+                    <div class="w-8 h-8 rounded-full bg-[#C8882A] flex items-center justify-center font-serif text-white font-bold text-sm shadow-inner">
+                        L
+                    </div>
+                    <span class="font-serif text-lg font-bold tracking-wide text-white">Lumière Dining</span>
                 </div>
 
                 <!-- User Profile Section -->
@@ -44,11 +49,11 @@
                         <div class="w-10 h-10 rounded-full bg-[#C8882A] flex items-center justify-center font-bold font-serif text-white text-lg">
                             {{ substr(Auth::user()->nama, 0, 1) }}
                         </div>
-                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#4CAF82] rounded-full border-2 border-[#1A1A1A]"></div>
+                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#4CAF82] rounded-full border-2 border-[#3D2D1E]"></div>
                     </div>
                     <div class="overflow-hidden">
                         <h4 class="text-sm font-semibold truncate">{{ Auth::user()->nama }}</h4>
-                        <p class="text-[11px] text-[#AB9BB0] truncate">{{ Auth::user()->email }}</p>
+                        <p class="text-[11px] text-[#AB9BB0] truncate font-medium">Pelanggan</p>
                     </div>
                 </div>
 
@@ -92,7 +97,7 @@
                     @csrf
                     <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#E95252] hover:bg-[#E95252]/10 transition-all duration-150">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                        <span>Logout</span>
+                        <span>Keluar</span>
                     </button>
                 </form>
             </div>

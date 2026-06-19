@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class AuthController extends Controller
 {
@@ -86,6 +88,12 @@ class AuthController extends Controller
             });
 
             Auth::login($user);
+
+            try {
+                Mail::to($user->email)->send(new WelcomeMail($user));
+            } catch (\Exception $e) {
+                logger()->warning('Gagal mengirim email sambutan ke ' . $user->email . ': ' . $e->getMessage());
+            }
 
             return redirect()->route('dashboard')
                 ->with('success', 'Registrasi berhasil! Selamat datang di Lumière Dining.');

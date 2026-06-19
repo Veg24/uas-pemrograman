@@ -1,66 +1,115 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🍽️ Lumière Dining - Premium Restaurant Management System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Lumière Dining adalah sistem manajemen pemesanan meja (*table reservation*) dan pemesanan menu hidangan premium (*food ordering*) berbasis web. Proyek ini dikembangkan dengan antarmuka yang mewah, premium, dan responsif menggunakan **Laravel 11**, **Tailwind CSS**, dan **Alpine.js**.
 
-## About Laravel
+Sistem ini dirancang khusus untuk memberikan pengalaman pengguna kelas atas, mulai dari visualisasi estetika *warm gold & brown*, pendaftaran bertahap, pemilihan zona meja, transaksi makanan secara interaktif, hingga pelacakan riwayat pesanan yang komprehensif.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## ✨ Fitur Utama
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 1. Sistem Autentikasi Ganda
+* **Registrasi & Login Terintegrasi**: Pendaftaran bertahap (*multi-step stepper form*) yang menawan secara visual.
+* **Autentikasi Fleksibel**: Pengguna dapat masuk menggunakan **Email** atau **Nomor Handphone (`no_hp`)**.
+* **Log Audit Keamanan**: Setiap aktivitas pendaftaran, masuk (*login*), dan keluar (*logout*) dicatat secara otomatis dalam tabel `audit_logs` di database.
+* **Email Sambutan Otomatis**: Pengiriman HTML Welcome Email yang didesain eksklusif langsung setelah pengguna berhasil mendaftar.
 
-## Learning Laravel
+### 2. Reservasi Meja Eksklusif
+* **Zona Area Meja**: Pilihan area makan yaitu **Indoor** (mewah, tenang) atau **Terrace** (terbuka, pemandangan luar).
+* **Grid Kalender & Slot Waktu**: Memilih tanggal reservasi dan waktu kedatangan secara visual yang responsif.
+* **Manajemen Meja**: Sistem otomatis mengunci nomor meja yang dipilih berdasarkan kapasitas tamu dan area.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 3. Pemesanan Makanan Premium
+* **Kategori Menu**: Filtrasi hidangan yang interaktif (Makanan Utama, Appetizer, Dessert, dan Minuman).
+* **Keranjang Belanja Real-Time**: Penambahan, pengurangan, dan penghapusan item hidangan secara instan menggunakan micro-interactions.
+* **Metode Pembayaran**: Dukungan pilihan pembayaran modern seperti **QRIS**, **Transfer Bank**, atau **Tunai (Cash)**.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 4. Dasbor & Riwayat Aktivitas
+* **Informasi Dasbor Dinamis**: Menampilkan hitung mundur (*countdown*) reservasi aktif mendatang, kartu statistik pesanan, dan menu-menu terpopuler.
+* **Timeline Aktivitas**: Catatan transaksi reservasi, pemesanan hidangan, serta log aktivitas pengguna yang disajikan dalam format *vertical timeline*.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## 🛠️ Teknologi & Arsitektur
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Sistem dibangun menggunakan kombinasi teknologi modern berstandar industri:
+* **Backend**: Laravel 11.x & PHP 8.5+
+* **Database**: MySQL (Development) & SQLite In-Memory (Automated testing)
+* **Frontend**: Tailwind CSS & Alpine.js (untuk reaktivitas tanpa *bloat*)
+* **Build Tool**: Vite Asset Bundler
+* **Pengujian**: PHPUnit (TDD Ready)
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+## 🚀 Panduan Instalasi & Penggunaan
 
-## Contributing
+Ikuti langkah-langkah berikut untuk menjalankan aplikasi di lingkungan lokal Anda (seperti Laragon, XAMPP, atau PHP CLI):
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 1. Kloning Repositori
+```bash
+git clone https://github.com/username/uas_pemrograman.git
+cd uas_pemrograman
+```
 
-## Code of Conduct
+### 2. Instalasi Dependensi
+Instal dependensi backend PHP (Composer) dan frontend JavaScript (NPM):
+```bash
+composer install
+npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 3. Konfigurasi Lingkungan (.env)
+Salin file konfigurasi `.env.example` menjadi `.env`:
+```bash
+cp .env.example .env
+```
+*Pastikan konfigurasi database di file `.env` Anda sudah diarahkan ke MySQL lokal Anda.*
+```ini
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=lumiere_dining
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Security Vulnerabilities
+### 4. Generate App Key & Jalankan Migrasi + Seeder
+Buat database baru dengan nama `lumiere_dining` di MySQL server Anda, kemudian jalankan:
+```bash
+php artisan key:generate
+php artisan migrate:fresh --seed
+```
+*Perintah di atas akan membuat semua struktur tabel yang dibutuhkan dan mengisi database dengan default meja, menu hidangan premium, serta akun uji coba.*
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. Jalankan Server Pengembangan
+Jalankan server Laravel dan compiler aset Vite:
+```bash
+# Terminal 1: Menjalankan Laravel Server
+php artisan serve
 
-## License
+# Terminal 2: Menjalankan Vite Development Server
+npm run dev
+```
+Buka peramban (browser) Anda dan akses **`http://localhost:8000`**.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 🧪 Akun Uji Coba (Default Seeded Users)
+Untuk mencoba fitur aplikasi tanpa registrasi ulang, gunakan kredensial berikut:
+* **Email / No. HP**: `guest@lumiere.com` atau `081234567890`
+* **Password**: `password`
+
+---
+
+## 🎯 Menjalankan Unit & Integration Test
+Aplikasi telah dilengkapi dengan pengujian terotomatisasi (*automated tests*) untuk menguji validasi registrasi, autentikasi ganda, pengiriman email welcome, dan session persistence.
+
+Jalankan perintah berikut:
+```bash
+php artisan test
+```
+
+---
+
+## 📄 Lisensi
+Proyek ini dilisensikan di bawah [MIT License](LICENSE).
