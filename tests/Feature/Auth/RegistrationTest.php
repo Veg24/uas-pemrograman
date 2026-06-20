@@ -38,7 +38,7 @@ class RegistrationTest extends TestCase
             'no_hp' => '08123456789',
         ]);
 
-        \Illuminate\Support\Facades\Mail::assertSent(\App\Mail\WelcomeMail::class, function ($mail) {
+        \Illuminate\Support\Facades\Mail::assertQueued(\App\Mail\WelcomeMail::class, function ($mail) {
             return $mail->hasTo('test@example.com') && $mail->user->nama === 'Test User';
         });
     }

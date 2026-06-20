@@ -14,7 +14,18 @@ class ReservasiController extends Controller
     public function index()
     {
         $mejas = Meja::all();
-        return view('reservasi.index', compact('mejas'));
+        $reservasis = Reservasi::where('status', '!=', 'dibatalkan')
+            ->where('tanggal', '>=', today()->toDateString())
+            ->get(['meja_id', 'tanggal', 'jam'])
+            ->map(function ($r) {
+                return [
+                    'meja_id' => $r->meja_id,
+                    'tanggal' => $r->tanggal->format('Y-m-d'),
+                    'jam' => substr($r->jam, 0, 5),
+                ];
+            });
+
+        return view('reservasi.index', compact('mejas', 'reservasis'));
     }
 
     public function store(Request $request)
@@ -30,8 +41,26 @@ class ReservasiController extends Controller
         try {
             DB::transaction(function () use ($request) {
                 $meja = Meja::findOrFail($request->meja_id);
-                if ($meja->status !== 'tersedia') {
-                    throw new \Exception('Meja #' . $meja->nomor_meja . ' saat ini sedang tidak tersedia.');
+                
+                // 1. Check if table is under maintenance
+                if ($meja->status === 'maintenance') {
+                    throw new \Exception('Meja #' . $meja->nomor_meja . ' saat ini sedang tidak tersedia karena pemeliharaan.');
+                }
+
+                // 2. Validate table capacity
+                if ($request->jumlah_tamu > $meja->kapasitas) {
+                    throw new \Exception('Jumlah tamu (' . $request->jumlah_tamu . ' orang) melebihi kapasitas maksimal Meja #' . $meja->nomor_meja . ' (Maksimal: ' . $meja->kapasitas . ' orang).');
+                }
+
+                // 3. Check for reservation date/time conflicts (overlapping reservations)
+                $conflict = Reservasi::where('meja_id', $request->meja_id)
+                    ->where('tanggal', $request->tanggal)
+                    ->where('jam', $request->jam)
+                    ->where('status', '!=', 'dibatalkan')
+                    ->exists();
+
+                if ($conflict) {
+                    throw new \Exception('Meja #' . $meja->nomor_meja . ' sudah dipesan untuk tanggal ' . $request->tanggal . ' jam ' . $request->jam . '.');
                 }
 
                 // Create reservation
@@ -45,9 +74,6 @@ class ReservasiController extends Controller
                     'status' => 'dikonfirmasi', // Default status as confirmed
                     'biaya_deposit' => 50000.00,
                 ]);
-
-                // Update table status to terisi
-                $meja->update(['status' => 'terisi']);
 
                 // Log to AuditLog
                 AuditLog::create([
@@ -64,23 +90,19 @@ class ReservasiController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $reservasi = Reservasi::with('meja')->where('user_id', Auth::id())->findOrFail($id);
         return view('reservasi.show', compact('reservasi'));
     }
 
-    public function destroy($id)
+    public function destroy(int $id)
     {
         try {
             DB::transaction(function () use ($id) {
                 $reservasi = Reservasi::where('user_id', Auth::id())->findOrFail($id);
                 
-                // Update table status back to tersedia
                 $meja = $reservasi->meja;
-                if ($meja) {
-                    $meja->update(['status' => 'tersedia']);
-                }
 
                 // Update reservation status to dibatalkan
                 $reservasi->update(['status' => 'dibatalkan']);

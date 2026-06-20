@@ -50,7 +50,7 @@ class PesananController extends Controller
                 $itemsToCreate = [];
 
                 foreach ($request->items as $item) {
-                    $menu = Menu::findOrFail($item['menu_id']);
+                    $menu = Menu::where('id', $item['menu_id'])->lockForUpdate()->firstOrFail();
                     
                     if ($menu->stok < $item['jumlah']) {
                         throw new \Exception('Stok untuk menu "' . $menu->nama_menu . '" tidak mencukupi. Tersisa: ' . $menu->stok);
@@ -119,7 +119,7 @@ class PesananController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(int $id)
     {
         $pesanan = Pesanan::with('pesananItems.menu')->where('user_id', Auth::id())->findOrFail($id);
         return view('pesan.show', compact('pesanan'));

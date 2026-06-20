@@ -1,29 +1,5 @@
 <x-app-layout>
-    <div x-data="{
-        tanggal: '2026-05-10',
-        jam: '19:00',
-        mejaId: '{{ $mejas->where('nomor_meja', 4)->first()->id ?? '' }}',
-        mejaNomor: '4',
-        mejaArea: 'indoor',
-        mejaKapasitas: 6,
-        jumlahTamu: 2,
-        catatan: '',
-        selectMeja(id, nomor, area, kapasitas) {
-            this.mejaId = id;
-            this.mejaNomor = nomor;
-            this.mejaArea = area;
-            this.mejaKapasitas = kapasitas;
-        },
-        formatDate(dateStr) {
-            if (!dateStr) return '';
-            const parts = dateStr.split('-');
-            if (parts.length !== 3) return dateStr;
-            const date = new Date(parts[0], parts[1] - 1, parts[2]);
-            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-            return days[date.getDay()] + ', ' + date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
-        }
-    }" class="space-y-6">
+    <div x-data="reservasiForm()" class="space-y-6">
         
         <!-- Page Title -->
         <div class="pb-4">
@@ -51,9 +27,9 @@
                         <div class="space-y-4">
                             <!-- Calendar Month Header -->
                             <div class="flex items-center justify-between">
-                                <button type="button" class="text-[#7A6A58] hover:text-[#C8882A] font-bold">&lt;</button>
-                                <span class="font-serif font-bold text-sm text-[#1A1A1A]">Mei 2026</span>
-                                <button type="button" class="text-[#7A6A58] hover:text-[#C8882A] font-bold">&gt;</button>
+                                <button type="button" @click="prevMonth" class="text-[#7A6A58] hover:text-[#C8882A] font-bold">&lt;</button>
+                                <span class="font-serif font-bold text-sm text-[#1A1A1A]" x-text="monthNames[currentMonth] + ' ' + currentYear"></span>
+                                <button type="button" @click="nextMonth" class="text-[#7A6A58] hover:text-[#C8882A] font-bold">&gt;</button>
                             </div>
 
                             <!-- Calendar Days Header -->
@@ -61,38 +37,24 @@
                                 <span>Min</span><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span>
                             </div>
                             
-                            <!-- Calendar Grid for May 2026 (May 1st is Friday) -->
                             <div class="grid grid-cols-7 gap-1.5">
-                                <!-- April Filler Days -->
-                                <span class="h-8 flex items-center justify-center text-xs text-gray-300 font-mono">26</span>
-                                <span class="h-8 flex items-center justify-center text-xs text-gray-300 font-mono">27</span>
-                                <span class="h-8 flex items-center justify-center text-xs text-gray-300 font-mono">28</span>
-                                <span class="h-8 flex items-center justify-center text-xs text-gray-300 font-mono">29</span>
-                                <span class="h-8 flex items-center justify-center text-xs text-gray-300 font-mono">30</span>
+                                <!-- Blank days -->
+                                <template x-for="blank in blankdays">
+                                    <span class="h-8"></span>
+                                </template>
                                 
-                                <!-- May 1 & 2 -->
-                                <button type="button" @click="tanggal = '2026-05-01'" class="h-8 rounded-full text-xs font-mono font-bold flex items-center justify-center transition-all" :class="tanggal === '2026-05-01' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-[#FAF7F2]'">1</button>
-                                <button type="button" @click="tanggal = '2026-05-02'" class="h-8 rounded-full text-xs font-mono font-bold flex items-center justify-center transition-all" :class="tanggal === '2026-05-02' ? 'bg-[#1A1A1A] text-white' : 'text-[#1A1A1A] hover:bg-[#FAF7F2]'">2</button>
-                                
-                                <!-- May 3 to 9 -->
-                                @for($d = 3; $d <= 9; $d++)
-                                    <button type="button" @click="tanggal = '2026-05-0{{ $d }}'" 
-                                            class="h-8 rounded-full text-xs font-mono font-bold flex items-center justify-center transition-all" 
-                                            :class="tanggal === '2026-05-0{{ $d }}' 
-                                                ? 'bg-[#1A1A1A] text-white' 
-                                                : ('{{ $d }}' == 7 ? 'border border-[#C8882A] text-[#C8882A]' : 'text-[#1A1A1A] hover:bg-[#FAF7F2]')"
-                                    >{{ $d }}</button>
-                                @endfor
-
-                                <!-- May 10 to 31 -->
-                                @for($d = 10; $d <= 31; $d++)
-                                    <button type="button" @click="tanggal = '2026-05-{{ $d }}'" 
-                                            class="h-8 rounded-full text-xs font-mono font-bold flex items-center justify-center transition-all" 
-                                            :class="tanggal === '2026-05-{{ $d }}' 
-                                                ? 'bg-[#1A1A1A] text-white' 
-                                                : 'text-[#1A1A1A] hover:bg-[#FAF7F2]'"
-                                    >{{ $d }}</button>
-                                @endfor
+                                <!-- Active month days -->
+                                <template x-for="day in days">
+                                    <button 
+                                        type="button" 
+                                        @click="selectDate(day)" 
+                                        class="h-8 rounded-full text-xs font-mono font-bold flex items-center justify-center transition-all" 
+                                        :class="tanggal === `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}` 
+                                            ? 'bg-[#1A1A1A] text-white' 
+                                            : (isToday(day) ? 'border border-[#C8882A] text-[#C8882A]' : 'text-[#1A1A1A] hover:bg-[#FAF7F2]')"
+                                        x-text="day"
+                                    ></button>
+                                </template>
                             </div>
                         </div>
 
@@ -101,22 +63,19 @@
                             <span class="text-[10px] font-bold text-[#AB9BB0] tracking-widest uppercase block">Waktu Tersedia</span>
                             <div class="grid grid-cols-3 gap-2.5">
                                 @foreach (['11:00', '12:00', '13:00', '14:00', '17:00', '18:00', '19:00', '20:00', '21:00'] as $time)
-                                    @if ($time === '13:00' || $time === '20:00')
-                                        <button type="button" disabled class="py-3 rounded-lg bg-[#FAF8F5] text-gray-300 text-xs font-bold font-mono cursor-not-allowed">
-                                            {{ $time }}
-                                        </button>
-                                    @else
-                                        <button 
-                                            type="button"
-                                            @click="jam = '{{ $time }}'"
-                                            class="py-3 rounded-lg border text-xs font-bold font-mono flex items-center justify-center transition-all duration-150"
-                                            :class="jam === '{{ $time }}'
+                                    <button 
+                                        type="button"
+                                        :disabled="isTimeSlotReserved('{{ $time }}')"
+                                        @click="jam = '{{ $time }}'"
+                                        class="py-3 rounded-lg border text-xs font-bold font-mono flex items-center justify-center transition-all duration-150"
+                                        :class="isTimeSlotReserved('{{ $time }}')
+                                            ? 'bg-[#FAF8F5] text-gray-300 border-[#E8E0D5] cursor-not-allowed'
+                                            : (jam === '{{ $time }}'
                                                 ? 'bg-[#FEF6EB] text-[#C8882A] border-[#C8882A] shadow-sm'
-                                                : 'bg-white text-[#1A1A1A] border-[#E8E0D5] hover:border-[#C8882A]'"
-                                        >
-                                            {{ $time }}
-                                        </button>
-                                    @endif
+                                                : 'bg-white text-[#1A1A1A] border-[#E8E0D5] hover:border-[#C8882A]')"
+                                    >
+                                        {{ $time }}
+                                    </button>
                                 @endforeach
                             </div>
                         </div>
@@ -151,26 +110,19 @@
                             <span class="text-[10px] font-bold tracking-widest text-[#AB9BB0] uppercase block">INDOOR</span>
                             <div class="grid grid-cols-2 gap-4">
                                 @foreach ($mejas->where('area', 'indoor') as $meja)
-                                    @php
-                                        // Meja 3 booked visually to match the mockup
-                                        $isBooked = ($meja->nomor_meja == 3);
-                                    @endphp
-                                    @if ($isBooked)
-                                        <button type="button" disabled class="h-16 rounded-xl bg-gray-100 border border-gray-200 text-gray-400 flex flex-col items-center justify-center cursor-not-allowed">
-                                            <span class="text-sm font-bold font-mono">{{ $meja->nomor_meja }}</span>
-                                        </button>
-                                    @else
-                                        <button 
-                                            type="button"
-                                            @click="selectMeja('{{ $meja->id }}', '{{ $meja->nomor_meja }}', '{{ $meja->area }}', {{ $meja->kapasitas }})"
-                                            class="h-16 rounded-xl flex flex-col items-center justify-center border-2 transition-all duration-150"
-                                            :class="mejaId == '{{ $meja->id }}'
+                                    <button 
+                                        type="button"
+                                        :disabled="isMejaReserved('{{ $meja->id }}')"
+                                        @click="selectMeja('{{ $meja->id }}', '{{ $meja->nomor_meja }}', '{{ $meja->area }}', {{ $meja->kapasitas }})"
+                                        class="h-16 rounded-xl flex flex-col items-center justify-center border-2 transition-all duration-150"
+                                        :class="isMejaReserved('{{ $meja->id }}')
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                                            : (mejaId == '{{ $meja->id }}'
                                                 ? 'bg-[#C8882A] border-[#C8882A] text-white shadow-sm'
-                                                : 'bg-white border-[#4CAF82] text-[#1A1A1A] hover:border-[#C8882A]'"
-                                        >
-                                            <span class="text-sm font-bold font-mono">{{ $meja->nomor_meja }}</span>
-                                        </button>
-                                    @endif
+                                                : 'bg-white border-[#4CAF82] text-[#1A1A1A] hover:border-[#C8882A]')"
+                                    >
+                                        <span class="text-sm font-bold font-mono">{{ $meja->nomor_meja }}</span>
+                                    </button>
                                 @endforeach
                             </div>
                         </div>
@@ -182,11 +134,14 @@
                                 @foreach ($mejas->where('area', 'terrace') as $meja)
                                     <button 
                                         type="button"
+                                        :disabled="isMejaReserved('{{ $meja->id }}')"
                                         @click="selectMeja('{{ $meja->id }}', '{{ $meja->nomor_meja }}', '{{ $meja->area }}', {{ $meja->kapasitas }})"
                                         class="w-16 h-16 rounded-full flex items-center justify-center border-2 transition-all duration-150"
-                                        :class="mejaId == '{{ $meja->id }}'
-                                            ? 'bg-[#C8882A] border-[#C8882A] text-white shadow-sm'
-                                            : 'bg-white border-[#4CAF82] text-[#1A1A1A] hover:border-[#C8882A]'"
+                                        :class="isMejaReserved('{{ $meja->id }}')
+                                            ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
+                                            : (mejaId == '{{ $meja->id }}'
+                                                ? 'bg-[#C8882A] border-[#C8882A] text-white shadow-sm'
+                                                : 'bg-white border-[#4CAF82] text-[#1A1A1A] hover:border-[#C8882A]')"
                                     >
                                         <span class="text-sm font-bold font-mono">{{ $meja->nomor_meja }}</span>
                                     </button>
@@ -282,4 +237,98 @@
 
         </form>
     </div>
+
+    <script>
+        function reservasiForm() {
+            return {
+                tanggal: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })(),
+                jam: '19:00',
+                mejaId: '',
+                mejaNomor: '',
+                mejaArea: '',
+                mejaKapasitas: 0,
+                jumlahTamu: 2,
+                catatan: '',
+                reservasis: @json($reservasis),
+                currentMonth: new Date().getMonth(),
+                currentYear: new Date().getFullYear(),
+                monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+                init() {
+                    this.$watch('tanggal', () => this.validateSelection());
+                    this.$watch('jam', () => this.validateSelection());
+                },
+                validateSelection() {
+                    if (this.mejaId && this.isMejaReserved(this.mejaId)) {
+                        this.mejaId = '';
+                        this.mejaNomor = '';
+                        this.mejaArea = '';
+                        this.mejaKapasitas = 0;
+                    }
+                },
+                get days() {
+                    let days = [];
+                    let totalDays = new Date(this.currentYear, this.currentMonth + 1, 0).getDate();
+                    for (let i = 1; i <= totalDays; i++) {
+                        days.push(i);
+                    }
+                    return days;
+                },
+                get blankdays() {
+                    let count = new Date(this.currentYear, this.currentMonth, 1).getDay();
+                    let arr = [];
+                    for (let i = 0; i < count; i++) {
+                        arr.push(i);
+                    }
+                    return arr;
+                },
+                prevMonth() {
+                    if (this.currentMonth === 0) {
+                        this.currentMonth = 11;
+                        this.currentYear--;
+                    } else {
+                        this.currentMonth--;
+                    }
+                },
+                nextMonth() {
+                    if (this.currentMonth === 11) {
+                        this.currentMonth = 0;
+                        this.currentYear++;
+                    } else {
+                        this.currentMonth++;
+                    }
+                },
+                selectDate(day) {
+                    const formattedMonth = String(this.currentMonth + 1).padStart(2, '0');
+                    const formattedDay = String(day).padStart(2, '0');
+                    this.tanggal = `${this.currentYear}-${formattedMonth}-${formattedDay}`;
+                },
+                isToday(day) {
+                    const today = new Date();
+                    return today.getDate() === day && today.getMonth() === this.currentMonth && today.getFullYear() === this.currentYear;
+                },
+                isMejaReserved(mejaId) {
+                    return this.reservasis.some(r => r.meja_id == mejaId && r.tanggal === this.tanggal && r.jam === this.jam);
+                },
+                isTimeSlotReserved(time) {
+                    if (!this.mejaId) return false;
+                    return this.reservasis.some(r => r.meja_id == this.mejaId && r.tanggal === this.tanggal && r.jam === time);
+                },
+                selectMeja(id, nomor, area, kapasitas) {
+                    this.mejaId = id;
+                    this.mejaNomor = nomor;
+                    this.mejaArea = area;
+                    this.mejaKapasitas = kapasitas;
+                },
+                formatDate(dateStr) {
+                    if (!dateStr) return '';
+                    const parts = dateStr.split('-');
+                    if (parts.length !== 3) return dateStr;
+                    const date = new Date(parts[0], parts[1] - 1, parts[2]);
+                    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+                    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                    return days[date.getDay()] + ', ' + date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+                }
+            };
+        }
+    </script>
 </x-app-layout>

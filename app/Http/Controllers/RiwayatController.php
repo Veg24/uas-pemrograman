@@ -6,6 +6,7 @@ use App\Models\Reservasi;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Carbon\Carbon;
 
@@ -25,9 +26,14 @@ class RiwayatController extends Controller
         $pesananDibatalkan = Pesanan::where('user_id', $user->id)->where('status', 'dibatalkan')->count();
         $totalDibatalkan = $reservasiDibatalkan + $pesananDibatalkan;
 
-        // Query database
-        $reservasiQuery = Reservasi::with('meja')->where('user_id', $user->id);
-        $pesananQuery = Pesanan::where('user_id', $user->id);
+        // 1. Build unified queries
+        $reservasiSub = DB::table('reservasis')
+            ->select('id', DB::raw("'reservasi' as tipe"), 'status', 'created_at')
+            ->where('user_id', $user->id);
+
+        $pesananSub = DB::table('pesanans')
+            ->select('id', DB::raw("'pesan' as tipe"), 'status', 'created_at')
+            ->where('user_id', $user->id);
 
         // Filter by period
         if ($periode !== 'semua') {
@@ -38,70 +44,89 @@ class RiwayatController extends Controller
                 default => Carbon::now()->subDays(30),
             };
 
-            $reservasiQuery->where('created_at', '>=', $dateLimit);
-            $pesananQuery->where('created_at', '>=', $dateLimit);
+            $reservasiSub->where('created_at', '>=', $dateLimit);
+            $pesananSub->where('created_at', '>=', $dateLimit);
         }
+
+        // Apply Tab Filter
+        if ($tab === 'reservasi') {
+            $unionQuery = $reservasiSub;
+        } elseif ($tab === 'pesan') {
+            $unionQuery = $pesananSub;
+        } else {
+            if ($tab === 'dibatalkan') {
+                $reservasiSub->where('status', 'dibatalkan');
+                $pesananSub->where('status', 'dibatalkan');
+            }
+            $unionQuery = $reservasiSub->union($pesananSub);
+        }
+
+        // Get Paginated IDs and Types
+        $paginatedUnion = DB::table(DB::raw("({$unionQuery->toSql()}) as combined"))
+            ->mergeBindings($unionQuery)
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
+        // Gather details for the 5 items on the current page
+        $items = $paginatedUnion->items();
+        
+        $reservasiIds = [];
+        $pesananIds = [];
+        foreach ($items as $item) {
+            if ($item->tipe === 'reservasi') {
+                $reservasiIds[] = $item->id;
+            } else {
+                $pesananIds[] = $item->id;
+            }
+        }
+
+        $reservasis = Reservasi::with('meja')->whereIn('id', $reservasiIds)->get()->keyBy('id');
+        $pesanans = Pesanan::whereIn('id', $pesananIds)->get()->keyBy('id');
 
         $activities = collect();
-
-        // Gather reservations if applicable
-        if ($tab === 'semua' || $tab === 'reservasi' || $tab === 'dibatalkan') {
-            $reservasis = $reservasiQuery->get();
-            foreach ($reservasis as $r) {
-                if ($tab === 'dibatalkan' && $r->status !== 'dibatalkan') {
-                    continue;
+        foreach ($items as $item) {
+            if ($item->tipe === 'reservasi') {
+                $r = $reservasis->get($item->id);
+                if ($r) {
+                    $activities->push((object)[
+                        'id' => $r->id,
+                        'tipe' => 'reservasi',
+                        'judul' => 'Reservasi Meja #' . ($r->meja ? $r->meja->nomor_meja : 'N/A'),
+                        'deskripsi' => 'Tanggal: ' . $r->tanggal->format('d M Y') . ' Jam: ' . substr($r->jam, 0, 5) . ' • ' . $r->jumlah_tamu . ' Tamu',
+                        'status' => $r->status,
+                        'created_at' => $r->created_at,
+                        'url' => route('reservasi.show', $r->id),
+                        'meja_nomor' => $r->meja ? $r->meja->nomor_meja : 'N/A',
+                        'area' => $r->meja ? $r->meja->area : '',
+                        'jumlah_tamu' => $r->jumlah_tamu,
+                        'tanggal' => $r->tanggal,
+                        'jam' => $r->jam,
+                    ]);
                 }
-                $activities->push((object)[
-                    'id' => $r->id,
-                    'tipe' => 'reservasi',
-                    'judul' => 'Reservasi Meja #' . ($r->meja ? $r->meja->nomor_meja : 'N/A'),
-                    'deskripsi' => 'Tanggal: ' . $r->tanggal->format('d M Y') . ' Jam: ' . substr($r->jam, 0, 5) . ' • ' . $r->jumlah_tamu . ' Tamu',
-                    'status' => $r->status,
-                    'created_at' => $r->created_at,
-                    'url' => route('reservasi.show', $r->id),
-                    'meja_nomor' => $r->meja ? $r->meja->nomor_meja : 'N/A',
-                    'area' => $r->meja ? $r->meja->area : '',
-                    'jumlah_tamu' => $r->jumlah_tamu,
-                    'tanggal' => $r->tanggal,
-                    'jam' => $r->jam,
-                ]);
+            } else {
+                $p = $pesanans->get($item->id);
+                if ($p) {
+                    $activities->push((object)[
+                        'id' => $p->id,
+                        'tipe' => 'pesan',
+                        'judul' => 'Pemesanan Makanan #' . $p->id,
+                        'deskripsi' => 'Total: Rp' . number_format($p->total_harga, 0, ',', '.') . ' • Tipe: ' . ($p->tipe === 'dine_in' ? 'Dine In' : 'Delivery'),
+                        'status' => $p->status,
+                        'created_at' => $p->created_at,
+                        'url' => route('pesan.show', $p->id),
+                        'total_harga' => $p->total_harga,
+                        'tipe_pesanan' => $p->tipe,
+                    ]);
+                }
             }
         }
 
-        // Gather orders if applicable
-        if ($tab === 'semua' || $tab === 'pesan' || $tab === 'dibatalkan') {
-            $pesanans = $pesananQuery->get();
-            foreach ($pesanans as $p) {
-                if ($tab === 'dibatalkan' && $p->status !== 'dibatalkan') {
-                    continue;
-                }
-                $activities->push((object)[
-                    'id' => $p->id,
-                    'tipe' => 'pesan',
-                    'judul' => 'Pemesanan Makanan #' . $p->id,
-                    'deskripsi' => 'Total: Rp' . number_format($p->total_harga, 0, ',', '.') . ' • Tipe: ' . ($p->tipe === 'dine_in' ? 'Dine In' : 'Delivery'),
-                    'status' => $p->status,
-                    'created_at' => $p->created_at,
-                    'url' => route('pesan.show', $p->id),
-                    'total_harga' => $p->total_harga,
-                    'tipe_pesanan' => $p->tipe,
-                ]);
-            }
-        }
-
-        // Sort unified activities by created_at descending
-        $sortedActivities = $activities->sortByDesc('created_at')->values();
-
-        // Paginate manually
-        $page = $request->input('page', 1);
-        $perPage = 5;
-        $paginatedItems = $sortedActivities->slice(($page - 1) * $perPage, $perPage)->all();
-        
+        // Build the final paginator that Blade expects
         $paginatedActivities = new LengthAwarePaginator(
-            $paginatedItems,
-            $sortedActivities->count(),
-            $perPage,
-            $page,
+            $activities,
+            $paginatedUnion->total(),
+            $paginatedUnion->perPage(),
+            $paginatedUnion->currentPage(),
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
