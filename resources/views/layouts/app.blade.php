@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"
+      x-data="{ mobileSidebarOpen: false, darkMode: localStorage.getItem('darkMode') === 'true' }"
+      x-init="$watch('darkMode', val => localStorage.setItem('darkMode', val))"
+      :class="{ 'dark': darkMode }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=device-width, initial-scale=1">
@@ -13,7 +16,7 @@
     <!-- Scripts and Styles -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="bg-[#FAF7F2] font-sans antialiased text-[#1A1A1A]" x-data="{ mobileSidebarOpen: false }">
+<body class="bg-[#FAF7F2] dark:bg-[#121212] font-sans antialiased text-[#1A1A1A] dark:text-[#FAF7F2]">
     <div class="min-h-screen flex flex-col md:flex-row">
         
         <!-- Mobile Top Navbar -->
@@ -21,12 +24,28 @@
             <div class="flex items-center space-x-2">
                 <span class="font-serif text-lg font-bold tracking-widest text-[#C8882A]">LUMIÈRE</span>
             </div>
-            <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="text-white focus:outline-none">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path x-show="!mobileSidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    <path x-show="mobileSidebarOpen" style="display: none;" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
+            <div class="flex items-center space-x-2">
+                <!-- Dark Mode Toggle Mobile -->
+                <button 
+                    @click="darkMode = !darkMode" 
+                    class="p-2 text-[#D4C9BB] hover:text-white rounded-lg focus:outline-none"
+                    title="Toggle Dark Mode"
+                >
+                    <svg x-show="darkMode" class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: none;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.364 17.636l-.707.707M16.243 17.636l.707-.707M7.757 6.364l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                    </svg>
+                    <svg x-show="!darkMode" class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                </button>
+
+                <button @click="mobileSidebarOpen = !mobileSidebarOpen" class="text-white focus:outline-none">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path x-show="!mobileSidebarOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        <path x-show="mobileSidebarOpen" style="display: none;" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <!-- Sidebar -->
@@ -44,17 +63,35 @@
                 </div>
 
                 <!-- User Profile Section -->
-                <div class="p-6 flex items-center space-x-3 border-b border-[#4A3728]/35">
-                    <div class="relative">
-                        <div class="w-10 h-10 rounded-full bg-[#C8882A] flex items-center justify-center font-bold font-serif text-white text-lg">
-                            {{ substr(Auth::user()->nama, 0, 1) }}
+                <div class="p-6 flex items-center justify-between border-b border-[#4A3728]/35">
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <div class="relative flex-shrink-0">
+                            <div class="w-10 h-10 rounded-full bg-[#C8882A] flex items-center justify-center font-bold font-serif text-white text-lg">
+                                {{ substr(Auth::user()->nama, 0, 1) }}
+                            </div>
+                            <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#4CAF82] rounded-full border-2 border-[#3D2D1E]"></div>
                         </div>
-                        <div class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-[#4CAF82] rounded-full border-2 border-[#3D2D1E]"></div>
+                        <div class="overflow-hidden">
+                            <h4 class="text-sm font-semibold truncate text-white">{{ Auth::user()->nama }}</h4>
+                            <p class="text-[11px] text-[#AB9BB0] truncate font-medium">Pelanggan</p>
+                        </div>
                     </div>
-                    <div class="overflow-hidden">
-                        <h4 class="text-sm font-semibold truncate">{{ Auth::user()->nama }}</h4>
-                        <p class="text-[11px] text-[#AB9BB0] truncate font-medium">Pelanggan</p>
-                    </div>
+                    
+                    <!-- Dark/Light Mode Button -->
+                    <button 
+                        @click="darkMode = !darkMode" 
+                        class="p-2 text-[#D4C9BB] hover:text-white rounded-lg hover:bg-white/5 transition-all focus:outline-none flex-shrink-0"
+                        title="Toggle Dark/Light Mode"
+                    >
+                        <!-- Sun Icon (shown in Dark mode) -->
+                        <svg x-show="darkMode" class="w-5 h-5 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: none;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.364 17.636l-.707.707M16.243 17.636l.707-.707M7.757 6.364l.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
+                        </svg>
+                        <!-- Moon Icon (shown in Light mode) -->
+                        <svg x-show="!darkMode" class="w-5 h-5 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- Navigation Links -->

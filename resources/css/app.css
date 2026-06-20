@@ -3,3 +3,86 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Dark Mode Overrides */
+.dark body {
+    background-color: #121212 !important;
+    color: #FAF7F2 !important;
+}
+
+.dark .bg-\[\#FAF7F2\] {
+    background-color: #121212 !important;
+}
+
+.dark .bg-white {
+    background-color: #1E1712 !important; /* Warm dark brown matching Lumiere theme */
+}
+
+.dark .border-\[\#E8E0D5\] {
+    border-color: #4A3728 !important;
+}
+
+.dark .text-\[\#1A1A1A\] {
+    color: #FAF7F2 !important;
+}
+
+.dark .text-\[\#7A6A58\] {
+    color: #AB9BB0 !important;
+}
+
+.dark .bg-\[\#FAF8F5\] {
+    background-color: #2C1F15 !important;
+}
+
+.dark .bg-\[\#FAF7F2\] {
+    background-color: #22170F !important;
+}
+
+.dark .bg-gray-50 {
+    background-color: #241A12 !important;
+}
+
+.dark .border-gray-100 {
+    border-color: #3D2D1E !important;
+}
+
+.dark .border-gray-200 {
+    border-color: #3D2D1E !important;
+}
+
+.dark .text-gray-700 {
+    color: #D4C9BB !important;
+}
+
+.dark .text-gray-900 {
+    color: #FAF7F2 !important;
+}
+
+.dark .border-gray-300 {
+    border-color: #4A3728 !important;
+}
+
+.dark .bg-gray-100 {
+    background-color: #2E231B !important;
+}
+
+.dark .text-\[\#AB9BB0\] {
+    color: #AB9BB0 !important;
+}
+
+.dark .bg-\[\#FEF6EB\] {
+    background-color: #3A230F !important;
+}
+
+.dark .bg-\[\#FAF9F6\] {
+    background-color: #1E150F !important;
+}
+
+.dark .text-gray-300 {
+    color: #7A6A58 !important;
+}
+
+/* Ensure smooth transitions for color changing */
+body, div, header, aside, main, button, input, select, textarea {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
